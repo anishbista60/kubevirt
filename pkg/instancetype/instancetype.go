@@ -40,7 +40,6 @@ const (
 	InsufficientInstanceTypeMemoryResourcesErrorFmt = "insufficient Memory resources of %s provided by instance type, preference requires %s"
 	InsufficientVMMemoryResourcesErrorFmt           = "insufficient Memory resources of %s provided by VirtualMachine, preference requires %s"
 	NoVMCPUResourcesDefinedErrorFmt                 = "no CPU resources provided by VirtualMachine, preference requires %d vCPU"
-	logVerbosityLevel                               = 3
 )
 
 type Methods interface {
@@ -802,7 +801,8 @@ func (m *InstancetypeMethods) InferDefaultInstancetype(vm *virtv1.VirtualMachine
 	if err != nil {
 		var ignoreableInferenceErr *IgnoreableInferenceError
 		if errors.As(err, &ignoreableInferenceErr) && ignoreFailure {
-			log.Log.Object(vm).V(logVerbosityLevel).Info("Ignored error during inference of instancetype, clearing matcher.")
+			//nolint:gomnd
+			log.Log.Object(vm).V(3).Info("Ignored error during inference of instancetype, clearing matcher.")
 			vm.Spec.Instancetype = nil
 			return nil
 		}
@@ -837,7 +837,8 @@ func (m *InstancetypeMethods) InferDefaultPreference(vm *virtv1.VirtualMachine) 
 			*vm.Spec.Preference.InferFromVolumeFailurePolicy == virtv1.IgnoreInferFromVolumeFailure
 
 		if errors.As(err, &ignoreableInferenceErr) && ignoreFailure {
-			log.Log.Object(vm).V(logVerbosityLevel).Info("Ignored error during inference of preference, clearing matcher.")
+			//nolint:gomnd
+			log.Log.Object(vm).V(3).Info("Ignored error during inference of preference, clearing matcher.")
 			vm.Spec.Preference = nil
 			return nil
 		}

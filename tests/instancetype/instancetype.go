@@ -47,7 +47,6 @@ import (
 
 var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-compute] Instancetype and Preferences", decorators.SigCompute, func() {
 	var virtClient kubecli.KubevirtClient
-	const timeout = 300 * time.Second
 
 	BeforeEach(func() {
 		virtClient = kubevirt.Client()
@@ -217,7 +216,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			vm, err = virtClient.VirtualMachine(testsuite.GetTestNamespace(vm)).Create(context.Background(), vm, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			vmi, err = virtClient.VirtualMachineInstance(testsuite.GetTestNamespace(vmi)).Get(context.Background(), vm.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
@@ -232,10 +231,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 
 	Context("Instancetype and preference application", func() {
 		var vmi *virtv1.VirtualMachineInstance
-		const (
-			preferredTerminationGracePeriodSeconds = 15
-			expectedCausesLength                   = 3
-		)
+
 		BeforeEach(func() {
 			vmi = libvmifact.NewGuestless()
 		})
@@ -263,7 +259,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			vm, err = virtClient.VirtualMachine(testsuite.GetTestNamespace(vm)).Create(context.Background(), vm, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			_, err = virtClient.VirtualMachineInstance(testsuite.GetTestNamespace(vm)).Get(context.Background(), vm.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
@@ -299,7 +295,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			preference.Spec.Firmware = &instancetypev1beta1.FirmwarePreferences{
 				PreferredUseBios: pointer.P(true),
 			}
-			preference.Spec.PreferredTerminationGracePeriodSeconds = pointer.P(int64(preferredTerminationGracePeriodSeconds))
+			preference.Spec.PreferredTerminationGracePeriodSeconds = pointer.P(int64(15))
 			preference.Spec.PreferredSubdomain = pointer.P("non-existent-subdomain")
 			preference.Spec.Annotations = map[string]string{
 				"preferred-annotation-1": "1",
@@ -322,7 +318,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			vm, err = virtClient.VirtualMachine(testsuite.GetTestNamespace(vm)).Create(context.Background(), vm, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			vmi, err = virtClient.VirtualMachineInstance(testsuite.GetTestNamespace(vmi)).Get(context.Background(), vm.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
@@ -377,7 +373,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			vm, err = virtClient.VirtualMachine(testsuite.GetTestNamespace(vm)).Create(context.Background(), vm, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			vmi, err = virtClient.VirtualMachineInstance(testsuite.GetTestNamespace(vmi)).Get(context.Background(), vm.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
@@ -403,7 +399,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 
 			var apiStatus errors.APIStatus
 			Expect(goerrors.As(err, &apiStatus)).To(BeTrue(), "error should be type APIStatus")
-			Expect(apiStatus.Status().Details.Causes).To(HaveLen(expectedCausesLength))
+			Expect(apiStatus.Status().Details.Causes).To(HaveLen(3))
 
 			cause0 := apiStatus.Status().Details.Causes[0]
 			Expect(cause0.Type).To(Equal(metav1.CauseTypeFieldValueInvalid))
@@ -482,7 +478,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			vm, err = virtClient.VirtualMachine(testsuite.GetTestNamespace(vm)).Create(context.Background(), vm, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			vmi, err = virtClient.VirtualMachineInstance(testsuite.GetTestNamespace(vmi)).Get(context.Background(), vm.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
@@ -508,7 +504,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			vm, err = virtClient.VirtualMachine(testsuite.GetTestNamespace(vm)).Create(context.Background(), vm, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			vmi, err = virtClient.VirtualMachineInstance(testsuite.GetTestNamespace(vmi)).Get(context.Background(), vm.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
@@ -551,7 +547,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 				g.Expect(err).ToNot(HaveOccurred())
 				g.Expect(vm.Spec.Instancetype.RevisionName).ToNot(BeEmpty())
 				g.Expect(vm.Spec.Preference.RevisionName).ToNot(BeEmpty())
-			}, timeout, 1*time.Second).Should(Succeed())
+			}, 300*time.Second, 1*time.Second).Should(Succeed())
 
 			By("Checking that ControllerRevisions have been created for the VirtualMachineInstancetype and VirtualMachinePreference")
 			instancetypeRevision, err := virtClient.AppsV1().ControllerRevisions(testsuite.GetTestNamespace(vm)).Get(context.Background(), vm.Spec.Instancetype.RevisionName, metav1.GetOptions{})
@@ -713,9 +709,8 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 		)
 
 		const (
-			inferFromVolumeName     = "volume"
-			dataVolumeTemplateName  = "datatemplate"
-			dvSuccessTimeoutSeconds = 180
+			inferFromVolumeName    = "volume"
+			dataVolumeTemplateName = "datatemplate"
 		)
 
 		createAndValidateVirtualMachine := func() {
@@ -735,7 +730,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 			Expect(vm.Spec.Preference.InferFromVolume).To(BeEmpty())
 			Expect(vm.Spec.Preference.InferFromVolumeFailurePolicy).To(BeNil())
 
-			Eventually(matcher.ThisVM(vm)).WithTimeout(timeout).WithPolling(time.Second).Should(matcher.BeReady())
+			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
 
 			By("Validating the VirtualMachineInstance")
 			var vmi *virtv1.VirtualMachineInstance
@@ -798,7 +793,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 
 			sourceDV, err = virtClient.CdiClient().CdiV1beta1().DataVolumes(namespace).Create(context.Background(), sourceDV, metav1.CreateOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			libstorage.EventuallyDV(sourceDV, dvSuccessTimeoutSeconds, matcher.HaveSucceeded())
+			libstorage.EventuallyDV(sourceDV, 180, matcher.HaveSucceeded())
 
 			// This is the default but it should still be cleared
 			failurePolicy := virtv1.RejectInferFromVolumeFailure
@@ -917,7 +912,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 					)
 					blankDV, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(namespace).Create(context.Background(), blankDV, metav1.CreateOptions{})
 					Expect(err).ToNot(HaveOccurred())
-					libstorage.EventuallyDV(sourceDV, dvSuccessTimeoutSeconds, matcher.HaveSucceeded())
+					libstorage.EventuallyDV(sourceDV, 180, matcher.HaveSucceeded())
 
 					By("Creating a DataSource")
 					// TODO - Replace with libds?
@@ -1404,19 +1399,6 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 	})
 
 	Context("VirtualMachine using preference resource requirements", func() {
-		var (
-			guestMemory2GB = resource.MustParse("2Gi")
-			guestMemory1GB = resource.MustParse("1Gi")
-		)
-		const (
-			providedvCPUs    = 2
-			requiredNumvCPUs = 2
-			requiredvCPUs    = 4
-			providedCores    = 2
-			providedSockets  = 2
-			providedThreads  = 2
-		)
-
 		DescribeTable("should be accepted when", func(instancetype *instancetypev1beta1.VirtualMachineInstancetype, preference *instancetypev1beta1.VirtualMachinePreference, vm *virtv1.VirtualMachine) {
 			var err error
 			if instancetype != nil {
@@ -1439,7 +1421,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 					},
 					Spec: instancetypev1beta1.VirtualMachineInstancetypeSpec{
 						CPU: instancetypev1beta1.CPUInstancetype{
-							Guest: uint32(providedvCPUs),
+							Guest: uint32(2),
 						},
 					},
 				},
@@ -1450,7 +1432,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 					Spec: instancetypev1beta1.VirtualMachinePreferenceSpec{
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1527,7 +1509,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 					Spec: instancetypev1beta1.VirtualMachinePreferenceSpec{
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(requiredNumvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1547,7 +1529,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 									CPU: &virtv1.CPU{
 										Cores:   uint32(1),
 										Threads: uint32(1),
-										Sockets: uint32(providedSockets),
+										Sockets: uint32(2),
 									},
 								},
 							},
@@ -1567,7 +1549,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 						},
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1585,7 +1567,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 							Spec: virtv1.VirtualMachineInstanceSpec{
 								Domain: virtv1.DomainSpec{
 									CPU: &virtv1.CPU{
-										Cores:   uint32(providedCores),
+										Cores:   uint32(2),
 										Threads: uint32(1),
 										Sockets: uint32(1),
 									},
@@ -1638,7 +1620,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 						},
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1657,7 +1639,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 								Domain: virtv1.DomainSpec{
 									CPU: &virtv1.CPU{
 										Cores:   uint32(1),
-										Threads: uint32(providedThreads),
+										Threads: uint32(2),
 										Sockets: uint32(1),
 									},
 								},
@@ -1678,7 +1660,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 						},
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(requiredvCPUs),
+								Guest: uint32(4),
 							},
 						},
 					},
@@ -1696,9 +1678,9 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 							Spec: virtv1.VirtualMachineInstanceSpec{
 								Domain: virtv1.DomainSpec{
 									CPU: &virtv1.CPU{
-										Cores:   uint32(providedCores),
+										Cores:   uint32(2),
 										Threads: uint32(1),
-										Sockets: uint32(providedSockets),
+										Sockets: uint32(2),
 									},
 								},
 							},
@@ -1733,7 +1715,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 							Spec: virtv1.VirtualMachineInstanceSpec{
 								Domain: virtv1.DomainSpec{
 									Memory: &virtv1.Memory{
-										Guest: &guestMemory2GB,
+										Guest: resource.NewQuantity(2*1024*1024*1024, resource.BinarySI),
 									},
 								},
 							},
@@ -1778,7 +1760,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 					Spec: instancetypev1beta1.VirtualMachinePreferenceSpec{
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1857,7 +1839,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 					Spec: instancetypev1beta1.VirtualMachinePreferenceSpec{
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1898,7 +1880,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 						},
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1939,7 +1921,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 						},
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(providedvCPUs),
+								Guest: uint32(2),
 							},
 						},
 					},
@@ -1980,7 +1962,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 						},
 						Requirements: &instancetypev1beta1.PreferenceRequirements{
 							CPU: &instancetypev1beta1.CPUPreferenceRequirement{
-								Guest: uint32(requiredvCPUs),
+								Guest: uint32(4),
 							},
 						},
 					},
@@ -1998,7 +1980,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 							Spec: virtv1.VirtualMachineInstanceSpec{
 								Domain: virtv1.DomainSpec{
 									CPU: &virtv1.CPU{
-										Cores:   uint32(providedCores),
+										Cores:   uint32(2),
 										Threads: uint32(1),
 										Sockets: uint32(1),
 									},
@@ -2036,7 +2018,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 							Spec: virtv1.VirtualMachineInstanceSpec{
 								Domain: virtv1.DomainSpec{
 									Memory: &virtv1.Memory{
-										Guest: &guestMemory1GB,
+										Guest: resource.NewQuantity(1*1024*1024*1024, resource.BinarySI),
 									},
 								},
 							},
